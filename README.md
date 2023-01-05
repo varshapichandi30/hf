@@ -9,7 +9,7 @@ kubectl create namespace peers
 
 ***Setup Ca server
 ```
-helm install ca ./hlf-ca -n cas -f ./prod_example/helm_values/ca.yaml --set adminUsername=admin,adminPassword=admin-pw
+helm install ca ./charts/hlf-ca -n cas -f ./prod_example/helm_values/ca.yaml --set adminUsername=admin,adminPassword=admin-pw
 export CA_POD=$(kubectl get pods --namespace cas -l "app=hlf-ca,release=ca" -o jsonpath="{.items[0].metadata.name}")
 ```
 
@@ -95,7 +95,7 @@ NODE_KEY=$(ls ./config/ord${NUM}_MSP/keystore/*_sk)
 kubectl create secret generic -n orderers hlf--ord${NUM}-idkey --from-file=key.pem=${NODE_KEY}
 
 ****Install ord1
-helm install ord${NUM} ./hlf-ord  -n orderers -f ./prod_example/helm_values/ord${NUM}.yaml
+helm install ord${NUM} ./charts/hlf-ord  -n orderers -f ./prod_example/helm_values/ord${NUM}.yaml
 export ORD_POD=$(kubectl get pods --namespace orderers -l "app=hlf-ord,release=ord1" -o \
 jsonpath="{.items[0].metadata.name}")
 
@@ -109,7 +109,7 @@ kubectl logs -n orderers $ORD_POD
 
 **CouchDB install
 ```
-helm install cdb-peer${NUM} ./hlf-couchdb -n peers -f ./prod_example/helm_values/cdb-peer${NUM}.yaml
+helm install cdb-peer${NUM} ./charts/hlf-couchdb -n peers -f ./prod_example/helm_values/cdb-peer${NUM}.yaml
 export CDB_POD=$(kubectl get pods --namespace peers -l "app=hlf-couchdb,release=cdb-peer1" -o jsonpath="{.items[0].metadata.name}")
 kubectl logs -n peers $CDB_POD | grep 'Apache CouchDB has started on'
 ````
@@ -135,7 +135,7 @@ kubectl create secret generic -n peers hlf--peer${NUM}-idkey --from-file=key.pem
 
 ***Install peer helm chart
 ```
-helm install peer${NUM} ./hlf-peer -n peers -f ./prod_example/helm_values/peer${NUM}.yaml
+helm install peer${NUM} ./charts/hlf-peer -n peers -f ./prod_example/helm_values/peer${NUM}.yaml
 export PEER_POD=$(kubectl get pods --namespace peers -l "app=hlf-peer,release=peer1" -o jsonpath="{.items[0].metadata.name}")
 kubectl logs -n peers $PEER_POD | grep 'Starting peer'
 ```
