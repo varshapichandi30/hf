@@ -1,4 +1,9 @@
 
+***Set path for binary access
+```
+PATH=$PATH:../bin
+```
+
 ***Namespaces
 ```
 ***Create namespace
@@ -61,7 +66,6 @@ kubectl create secret generic -n peers hlf--peer-ca-cert --from-file=cacert.pem=
 
 ***Genesis and Channel
 ```
-cd ./config
 configtxgen -profile OrdererGenesis -outputBlock ./genesis.block -channelID system-channel
 configtxgen -profile MyChannel -channelID mychannel -outputCreateChannelTx ./mychannel.tx
 
