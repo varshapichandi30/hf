@@ -45,22 +45,22 @@ exit
 ```
 ```
 ***Copy credentials to host config folder
-kubectl cp $CA_POD:/config ./config -n cas
+kubectl cp $CA_POD:/config ./build/crypto-config -n cas
 
 ***Create orderer secrets
-ORG_CERT=$(ls ./config/OrdererMSP/admincerts/cert.pem)
+ORG_CERT=$(ls ./build/crypto-config/OrdererMSP/admincerts/cert.pem)
 kubectl create secret generic -n orderers hlf--ord-admincert --from-file=cert.pem=$ORG_CERT
-ORG_KEY=$(ls ./config/OrdererMSP/keystore/*_sk)
+ORG_KEY=$(ls ./build/crypto-config/OrdererMSP/keystore/*_sk)
 kubectl create secret generic -n orderers hlf--ord-adminkey --from-file=key.pem=$ORG_KEY
-CA_CERT=$(ls ./config/OrdererMSP/cacerts/*.pem)
+CA_CERT=$(ls ./build/crypto-config/OrdererMSP/cacerts/*.pem)
 kubectl create secret generic -n orderers hlf--ord-ca-cert --from-file=cacert.pem=$CA_CERT
 
 ***Create peer secrets
-ORG_CERT=$(ls ./config/PeerMSP/admincerts/cert.pem)
+ORG_CERT=$(ls ./build/crypto-config/PeerMSP/admincerts/cert.pem)
 kubectl create secret generic -n peers hlf--peer-admincert --from-file=cert.pem=$ORG_CERT
-ORG_KEY=$(ls ./config/PeerMSP/keystore/*_sk)
+ORG_KEY=$(ls ./build/crypto-config/PeerMSP/keystore/*_sk)
 kubectl create secret generic -n peers hlf--peer-adminkey --from-file=key.pem=$ORG_KEY
-CA_CERT=$(ls ./config/PeerMSP/cacerts/*.pem)
+CA_CERT=$(ls ./build/crypto-config/PeerMSP/cacerts/*.pem)
 kubectl create secret generic -n peers hlf--peer-ca-cert --from-file=cacert.pem=$CA_CERT
 ```
 
@@ -88,14 +88,14 @@ exit
 
 ***Copy certificates to host machine
 ```
-kubectl cp $CA_POD:/config ./config -n cas
+kubectl cp $CA_POD:/config ./build/crypto-config/ -n cas
 export NUM=1
 
 ***Create secrets
-NODE_CERT=$(ls ./config/ord${NUM}_MSP/signcerts/*.pem)
+NODE_CERT=$(ls ./build/crypto-config/ord${NUM}_MSP/signcerts/*.pem)
 kubectl create secret generic -n orderers hlf--ord${NUM}-idcert --from-file=cert.pem=${NODE_CERT}
 
-NODE_KEY=$(ls ./config/ord${NUM}_MSP/keystore/*_sk)
+NODE_KEY=$(ls ./build/crypto-config/ord${NUM}_MSP/keystore/*_sk)
 kubectl create secret generic -n orderers hlf--ord${NUM}-idkey --from-file=key.pem=${NODE_KEY}
 
 ****Install ord1
@@ -104,9 +104,9 @@ export ORD_POD=$(kubectl get pods --namespace orderers -l "app=hlf-ord,release=o
 jsonpath="{.items[0].metadata.name}")
 
 ***Copy certificates to MSP folder - It is a bug in the chart so we have to manually copy this
-kubectl cp  ./config/ord1_MSP/signcerts $ORD_POD:/var/hyperledger/msp -n orderers
-kubectl cp  ./config/ord1_MSP/cacerts $ORD_POD:/var/hyperledger/msp -n orderers
-kubectl cp  ./config/ord1_MSP/keystore $ORD_POD:/var/hyperledger/msp -n orderers
+kubectl cp  ./build/crypto-config/ord1_MSP/signcerts $ORD_POD:/var/hyperledger/msp -n orderers
+kubectl cp  ./build/crypto-config/ord1_MSP/cacerts $ORD_POD:/var/hyperledger/msp -n orderers
+kubectl cp  ./build/crypto-config/ord1_MSP/keystore $ORD_POD:/var/hyperledger/msp -n orderers
 
 kubectl logs -n orderers $ORD_POD 
 ```
@@ -130,10 +130,10 @@ exit
 
 *** Copy peer certificates to host
 ```
-kubectl cp $CA_POD:/config ./config -n cas
-NODE_CERT=$(ls ./config/peer${NUM}_MSP/signcerts/*.pem)
+kubectl cp $CA_POD:/config ./build/crypto-config/ -n cas
+NODE_CERT=$(ls ./build/crypto-config/peer${NUM}_MSP/signcerts/*.pem)
 kubectl create secret generic -n peers hlf--peer${NUM}-idcert --from-file=cert.pem=${NODE_CERT}
-NODE_KEY=$(ls ./config/peer${NUM}_MSP/keystore/*_sk)
+NODE_KEY=$(ls ./build/crypto-config/peer${NUM}_MSP/keystore/*_sk)
 kubectl create secret generic -n peers hlf--peer${NUM}-idkey --from-file=key.pem=${NODE_KEY}
 ```
 
