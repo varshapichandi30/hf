@@ -1,14 +1,109 @@
 image:
-  tag: 1.3.0
+  repository: hyperledger/fabric-peer
+  tag: 1.4.8
+  pullPolicy: IfNotPresent
+
+
+service:
+  annotations: {}
+  # Cluster IP or LoadBalancer
+  type: ClusterIP
+  portRequest: 7051
+  portEvent: 7053
+  portMetrics: 9443
+
+docker:
+  # Path of the docker socket on the host
+  socketPath: /var/run/docker.sock
+  # Docker config to be used to pull the images (base64'd)
+  config: null
+  # Docker config mount path
+  configMountPath: /root/.docker
+
+ingress:
+  enabled: false
+  ingressClassName:
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    # certmanager.k8s.io/cluster-issuer: "letsencrypt-staging"
+  pathType: ImplementationSpecific
+  path: /
+  hosts:
+    - hlf-peer.local
+  tls: []
+  #  - secretName: hlf-peer-tls
+  #    hosts:
+  #      - hlf-peer.local
 
 persistence:
+  enabled: true
+  annotations: {}
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: ""
   accessMode: ReadWriteOnce
   size: 1Gi
+  # existingClaim: ""
 
+logging:
+  level: info
+  peer: info
+  cauthdsl: warning
+  gossip: info
+  grpc: error
+  ledger: info
+  msp: warning
+  policies: warning
+  spec: ""
+
+
+##################################
+## Peer configuration options    #
+################################## 
 peer:
   databaseType: CouchDB
-  couchdbInstance: cdb-peer2
-  mspID: PeerMSP
+  # If CouchDB is used the name of the secret holding couchdb credentials
+  couchdbSecret: cdb-peer2-hlf-couchdb
+  couchdbService: cdb-peer2-hlf-couchdb
+  couchdbPort: 5984
+
+  # couchdbInstance: cdb-peer2
+  mspID: Org1MSP
+  gossip:
+    bootstrap: peer2-hlf-peer.peers.svc.cluster.local:7051
+    endpoint: peer2-hlf-peer.peers.svc.cluster.local:7051
+    externalEndpoint: peer2-hlf-peer.peers.svc.cluster.local:7051
+    orgLeader: "false"
+    useLeaderElection: "true"
+
+  tls:
+    server:
+      enabled: "false"
+    client:
+      enabled: "false"
+  chaincode:
+    # define the ccenv image used by the peer
+    builder: hyperledger/fabric-ccenv:1.4.0
+    runtime:
+      golang: ""
+      java: ""
+      node: ""
+  metrics:
+    provider: "disabled"
+    statsd:
+      network: "udp"
+      address: "127.0.0.1:8125"
+      writeInterval: "10s"
+      prefix: ""
+
+  docker:
+    enabled: true
 
 secrets:
   peer:
@@ -18,14 +113,30 @@ secrets:
   channel: hlf--channel
   adminCert: hlf--peer-admincert
   adminKey: hlf--peer-adminkey
-  caServerTls: ca--tls
+  # caServerTls: ca--tls
+
+resources: {}
+  ## We usually recommend not to specify default resources and to leave this as a conscious
+  ## choice for the user. This also increases chances charts run on environments with little
+  ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+  ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
 
 affinity:
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 95
-        podAffinityTerm:
-          topologyKey: "kubernetes.io/hostname"
-          labelSelector:
-            matchLabels:
-              app: hlf-peer
+  # podAntiAffinity:
+  #   preferredDuringSchedulingIgnoredDuringExecution:
+  #     - weight: 95
+  #       podAffinityTerm:
+  #         topologyKey: "kubernetes.io/hostname"
+  #         labelSelector:
+  #           matchLabels:
+  #             app: hlf-peer

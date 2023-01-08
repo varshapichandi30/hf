@@ -1,6 +1,10 @@
+# Default values for  hlf-peer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
 image:
-  repository: hyperledger/fabric-peer
-  tag: 1.4.8
+  repository: hyperledger/fabric-tools
+  tag: 1.4.0
   pullPolicy: IfNotPresent
   # pullImageSecret: docker-config
 
@@ -68,19 +72,19 @@ logging:
 ##################################
 peer:
   # Type of database ("goleveldb" or "CouchDB"):
-  databaseType: CouchDB
+  databaseType: goleveldb
   # If CouchDB is used the name of the secret holding couchdb credentials
   couchdbSecret: cdb-peer1-hlf-couchdb
-  couchdbService: cdb-peer1-hlf-couchdb
+  couchdbService: svc-couchdb
   couchdbPort: 5984
   ## MSP ID of the Peer
   mspID: Org1MSP
   gossip:
-    bootstrap: peer1-hlf-peer.peers.svc.cluster.local:7051
-    endpoint: peer1-hlf-peer.peers.svc.cluster.local:7051
-    externalEndpoint: peer1-hlf-peer.peers.svc.cluster.local:7051
-    orgLeader: "true"
-    useLeaderElection: "false"
+    bootstrap: ""
+    endpoint: ""
+    externalEndpoint: ""
+    orgLeader: "false"
+    useLeaderElection: "true"
 
   tls:
     server:
@@ -89,7 +93,7 @@ peer:
       enabled: "false"
   chaincode:
     # define the ccenv image used by the peer
-    builder: hyperledger/fabric-ccenv:1.4.0
+    builder: ""
     runtime:
       golang: ""
       java: ""
@@ -108,15 +112,15 @@ peer:
 # Secrets references, empty by default, fill in with your secrets (particularly adminCert) or add Peer Admin certificate manually after launching chart.
 secrets:
   ## These secrets should contain the Orderer crypto materials and credentials
-  peer:
+  peer: {}
     ## Credentials, saved under keys 'CA_USERNAME' and 'CA_PASSWORD'
     # cred: hlf--peer1-cred
     ## Certificate, saved under key 'cert.pem'
-    cert: hlf--peer1-idcert
+    # cert: hlf--peer1-idcert
     ## Key, saved under 'key.pem'
-    key: hlf--peer1-idkey
+    # key: hlf--peer1-idkey
     ## CA Cert, saved under 'cacert.pem'
-    caCert: hlf--peer-ca-cert
+    # caCert: hlf--peer1-cacert
     ## Intermediate CA Cert (optional), saved under 'intermediatecacert.pem'
     # intCaCert: hlf--peer1-caintcert
     ## TLS secret, saved under keys 'tls.crt' and 'tls.key' (to conform with K8S nomenclature)
@@ -129,15 +133,15 @@ secrets:
     # tlsClientRootCerts: hlf--ord-tlsrootcert
   ## This should contain "channel" transaction derived from a configtx.yaml
   ## configtxgen -profile ComposerChannel -channelID composerchannel -outputCreateChannelTx composerchannel.tx
-  channels:
-  - hlf--channel
+  # channels:
+  # - foochannel
   # - barchannel
   ## This should contain the Certificate of the Peer Organisation admin
   ## This is necessary to successfully run the peer
-  adminCert: hlf--peer-admincert
+  # adminCert: hlf--peer-admincert
   ## This should contain the Private Key of the Peer Organisation admin
   ## This is necessary to successfully join a channel
-  adminKey: hlf--peer-adminkey
+  # adminKey: hlf--peer-adminkey
   ## This should include the Orderer TLS 'cacert.pem'
   # ordTlsRootCert: hlf--ord-tlsrootcert
 

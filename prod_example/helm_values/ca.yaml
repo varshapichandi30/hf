@@ -11,7 +11,7 @@ ingress:
     # TODO: Change this to your Domain Name
     - ca.hgf.aidtech-test.xyz
   tls:
-    - secretName: ca--tls
+    - secretName: ca--tls-secret
       hosts:
         # TODO: Change this to your Domain Name
         - ca.hgf.aidtech-test.xyz

@@ -100,8 +100,7 @@ kubectl create secret generic -n orderers hlf--ord${NUM}-idkey --from-file=key.p
 
 ****Install ord1
 helm install ord${NUM} ./charts/hlf-ord  -n orderers -f ./prod_example/helm_values/ord${NUM}.yaml
-export ORD_POD=$(kubectl get pods --namespace orderers -l "app=hlf-ord,release=ord1" -o \
-jsonpath="{.items[0].metadata.name}")
+export ORD_POD=$(kubectl get pods --namespace orderers -l "app=hlf-ord,release=ord1" -o jsonpath="{.items[0].metadata.name}")
 
 ***Copy certificates to MSP folder - It is a bug in the chart so we have to manually copy this
 kubectl cp  ./build/crypto-config/ord1_MSP/signcerts $ORD_POD:/var/hyperledger/msp -n orderers
@@ -144,14 +143,23 @@ export PEER_POD=$(kubectl get pods --namespace peers -l "app=hlf-peer,release=pe
 kubectl logs -n peers $PEER_POD | grep 'Starting peer'
 ```
 
-***Join channel
+***Join channel in CLI
 ```
-kubectl exec -n peers --stdin --tty   $PEER_POD -- bin/bash
+helm install peer${NUM}-cli ./charts/hlf-peer-cli -n peers -f ./prod_example/helm_values/peer${NUM}-cli.yaml
+kubectl exec -n peers --stdin --tty   $POD_NAME -- bin/bash
+
+FABRIC_CFG_PATH=/etc/hyperledger/fabric/
 CORE_PEER_MSPCONFIGPATH=/var/hyperledger/admin_msp/
+
+#Create channel
 peer channel create -o ord1-hlf-ord.orderers.svc.cluster.local:7050 -c mychannel -f /hl_config/channel/hlf--channel/mychannel.tx
 
 peer channel fetch config mychannel.block -c mychannel -o ord1-hlf-ord.orderers.svc.cluster.local:7050
-peer join channel -b mychannel.block
+peer channel join -b mychannel.block
+
+peer chaincode query -C mychannel -n sacc -c '{"Args":["get","name"]}'
+peer chaincode instantiate -o ord1-hlf-ord.orderers.svc.cluster.local:7050 -n sacc -v 1.0 -c '{"Args":["key1","value1"]}' -C mychannel
+peer chaincode invoke -o ord1-hlf-ord.orderers.svc.cluster.local:7050 --peerAddresses peer1-hlf-peer.peers.svc.cluster.local:7051 -C mychannel -n sacc -c '{"Args":["set","name","Brahma"]}'
 ```
 
 
