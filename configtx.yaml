@@ -188,7 +188,7 @@ Application: &ApplicationDefaults
 Orderer: &OrdererDefaults
 
     # Orderer Type: The orderer implementation to start
-    OrdererType: solo
+    OrdererType: etcdraft
     
     # Addresses used to be the list of orderer addresses that clients and peers
     # could connect to.  However, this does not allow clients to associate orderer
@@ -198,6 +198,17 @@ Orderer: &OrdererDefaults
     Addresses:
         - ord1-hlf-ord.orderers.svc.cluster.local:7050
 
+    EtcdRaft:
+        # The set of Raft replicas for this network. For the etcd/raft-based
+        # implementation, we expect every replica to also be an OSN. Therefore,
+        # a subset of the host:port items enumerated in this list should be
+        # replicated under the Orderer.Addresses key above.
+        Consenters:
+            - Host:  ord1-hlf-ord.orderers.svc.cluster.local
+              Port: 7050
+              ClientTLSCert: ./build/crypto-config/ord1_MSP/tls/server.crt
+              ServerTLSCert: ./build/crypto-config/ord1_MSP/tls/server.crt
+            
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s
 

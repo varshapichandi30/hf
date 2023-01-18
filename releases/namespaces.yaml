@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: cas
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: orderers
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: peers

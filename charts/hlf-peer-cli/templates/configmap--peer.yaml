@@ -61,15 +61,15 @@ data:
   ##########
   # TLS    #
   ##########
-  CORE_PEER_TLS_ENABLED: {{ .Values.peer.tls.server.enabled | quote }}
-  CORE_PEER_TLS_CERT_FILE: "/var/hyperledger/tls/server/pair/tls.crt"
-  CORE_PEER_TLS_KEY_FILE: "/var/hyperledger/tls/server/pair/tls.key"
-  CORE_PEER_TLS_ROOTCERT_FILE: "/var/hyperledger/tls/server/cert/cacert.pem"
-  CORE_PEER_TLS_CLIENTAUTHREQUIRED: {{ .Values.peer.tls.client.enabled | quote }}
+  CORE_PEER_TLS_ENABLED: "true"
+  CORE_PEER_TLS_CERT_FILE: "/var/hyperledger/tls/server/pair/server.crt"
+  CORE_PEER_TLS_KEY_FILE: "/var/hyperledger/tls/server/pair/server.key"
+  CORE_PEER_TLS_ROOTCERT_FILE: "/var/hyperledger/tls/server/cert/key.pem"
+  CORE_PEER_TLS_CLIENTAUTHREQUIRED: "false"
   # This is fixed prior to starting the peer
-  CORE_PEER_TLS_CLIENTROOTCAS_FILES: "/var/hyperledger/tls/client/cert/*"
-  CORE_PEER_TLS_CLIENTCERT_FILE: "/var/hyperledger/tls/client/pair/tls.crt"
-  CORE_PEER_TLS_CLIENTKEY_FILE: "/var/hyperledger/tls/client/pair/tls.key"
+  # CORE_PEER_TLS_CLIENTROOTCAS_FILES: "/var/hyperledger/tls/client/cert/*"
+  # CORE_PEER_TLS_CLIENTCERT_FILE: "/var/hyperledger/tls/client/pair/tls.crt"
+  # CORE_PEER_TLS_CLIENTKEY_FILE: "/var/hyperledger/tls/client/pair/tls.key"
   {{- if .Values.peer.docker.enabled }}
   CORE_VM_ENDPOINT: unix:///host/var/run/docker.sock
   {{- end}}

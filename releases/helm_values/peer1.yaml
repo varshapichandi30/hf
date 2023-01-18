@@ -1,10 +1,6 @@
-# Default values for  hlf-peer.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 image:
-  repository: hyperledger/fabric-tools
-  tag: 1.4.0
+  repository: hyperledger/fabric-peer
+  tag: 1.4.8
   pullPolicy: IfNotPresent
   # pullImageSecret: docker-config
 
@@ -88,9 +84,9 @@ peer:
 
   tls:
     server:
-      enabled: "false"
-    client:
-      enabled: "false"
+      enabled: "true"
+    # client:
+    #   enabled: "false"
   chaincode:
     # define the ccenv image used by the peer
     builder: hyperledger/fabric-ccenv:1.4.0
@@ -124,9 +120,9 @@ secrets:
     ## Intermediate CA Cert (optional), saved under 'intermediatecacert.pem'
     # intCaCert: hlf--peer1-caintcert
     ## TLS secret, saved under keys 'tls.crt' and 'tls.key' (to conform with K8S nomenclature)
-    # tls: hlf--peer1-tls
+    tls: hlf--peer1-tls
     ## TLS root CA certificate saved under key 'cert.pem'
-    # tlsRootCert: hlf--peer-tlsrootcert
+    tlsRootCert: hlf--peer-tlsrootcert
     ## TLS secret, saved under keys 'tls.crt' and 'tls.key' (to conform with K8S nomenclature)
     # tlsClient: hlf--peer1-tls
     ## TLS client root CA certificates saved under any names (as there may be multiple)
@@ -143,7 +139,7 @@ secrets:
   ## This is necessary to successfully join a channel
   adminKey: hlf--peer-adminkey
   ## This should include the Orderer TLS 'cacert.pem'
-  # ordTlsRootCert: hlf--ord-tlsrootcert
+  # ordTlsRootCert: hlf--ord-tlsrootcert 
 
 resources: {}
   ## We usually recommend not to specify default resources and to leave this as a conscious
