@@ -14,7 +14,6 @@ kubectl apply -f ./releases/namespaces.yaml
 ```
 helm install ca ./charts/hlf-ca -n cas -f ./releases/helm_values/ca.yaml --set adminUsername=admin,adminPassword=admin-pw
 export CA_POD=$(kubectl get pods --namespace cas -l "app=hlf-ca,release=ca" -o jsonpath="{.items[0].metadata.name}")
-exit
 ```
 
 # Enroll Orderer and peer admin and generate secrets
@@ -37,8 +36,8 @@ kubectl cp ./scripts/enrollOrderer.sh $CA_POD:/ -n cas
 #Login to CA
 kubectl exec -n cas --stdin --tty   $CA_POD -- sh
 #Enroll ord1 certs and tls
-chmod 777 ./scripts/enrollOrderer.sh
-./scripts/enrollOrderer.sh
+chmod 777 ./enrollOrderer.sh
+./enrollOrderer.sh
 exit
 #Copy certificates to host machine
 kubectl cp $CA_POD:/config ./build/crypto-config/ -n cas
@@ -94,16 +93,17 @@ kubectl logs -n peers $PEER_POD | grep 'Starting peer'
 # Start a peer and join channel 
 ```
 helm install peer${NUM}-cli ./charts/hlf-peer-cli -n peers -f ./releases/helm_values/peer${NUM}-cli.yaml
-kubectl exec -n peers --stdin --tty   -- bin/bash
+export CLI_POD=$(kubectl get pods --namespace peers -l "app=hlf-peer,release=peer1-cli" -o jsonpath="{.items[0].metadata.name}")
+kubectl exec -n peers --stdin --tty $CLI_POD  -- bin/bash
 
 FABRIC_CFG_PATH=/etc/hyperledger/fabric/
 CORE_PEER_MSPCONFIGPATH=/var/hyperledger/admin_msp/
 
 #Create channel
-peer channel create -o ord1-hlf-ord.orderers.svc.cluster.local:7050 -c mychannel -f /hl_config/channel/hlf--channel/mychannel.tx
+peer channel create -o ord1-hlf-ord.orderers.svc.cluster.local:7050 -c mychannel -f /hl_config/channel/hlf--channel/mychannel.tx --tls --cafile /var/hyperledger/tls/server/cert/key.pem
 
 #Join channel
-peer channel fetch config mychannel.block -c mychannel -o ord1-hlf-ord.orderers.svc.cluster.local:7050
+peer channel fetch config mychannel.block -c mychannel -o ord1-hlf-ord.orderers.svc.cluster.local:7050 --tls --cafile /var/hyperledger/tls/server/cert/key.pem
 peer channel join -b mychannel.block
 
 # Deploy chaincode and test

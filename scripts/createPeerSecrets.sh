@@ -4,7 +4,7 @@ kubectl create secret generic -n peers hlf--peer${NUM}-idcert --from-file=cert.p
 NODE_KEY=$(ls ./build/crypto-config/peer${NUM}_MSP/msp/keystore/*_sk)
 kubectl create secret generic -n peers hlf--peer${NUM}-idkey --from-file=key.pem=${NODE_KEY}
 
-ORG_TLS=$(ls ./build/crypto-config/PeerMSP/tlsca/*.pem)
+ORG_TLS=$(ls ./build/crypto-config/PeerMSP/tlscacerts/*.pem)
 kubectl create secret generic -n peers hlf--peer-tlsrootcert --from-file=key.pem=${ORG_TLS}
 
 
