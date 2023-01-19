@@ -115,9 +115,12 @@ peer chaincode query -C mychannel -n sacc -c '{"Args":["get","name"]}'
 peer chaincode invoke -o ord1-hlf-ord.orderers.svc.cluster.local:7050 --peerAddresses peer1-hlf-peer.peers.svc.cluster.local:7051 -C mychannel -n sacc -c '{"Args":["set","name","Brahma"]}'
 ```
 
-Troubleshooting
-```
-Check Logs of pod
-***Uninstall helm chart, example for orderer
-helm uninstall ord1 -n orderers
+***Remove Setup
+NUM=1
+helm uninstall ord${NUM} -n orderers
+helm uninstall peer${NUM} -n peers
+helm uninstall cdb-peer${NUM} -n peers
+helm uninstall peer${NUM}-cli -n peers
+kubectl delete secrets --all -n orderers
+kubectl delete secrets --all -n peers
 ```
