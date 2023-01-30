@@ -4,7 +4,7 @@
 
 image:
   repository: hyperledger/fabric-tools
-  tag: 1.4.0
+  tag: 2.2.9
   pullPolicy: IfNotPresent
   # pullImageSecret: docker-config
 
@@ -93,7 +93,7 @@ peer:
       enabled: "false"
   chaincode:
     # define the ccenv image used by the peer
-    builder: hyperledger/fabric-ccenv:1.4.0
+    builder: hyperledger/fabric-ccenv:2.2.9
     runtime:
       golang: ""
       java: ""

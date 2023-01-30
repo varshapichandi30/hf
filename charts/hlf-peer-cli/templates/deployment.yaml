@@ -113,6 +113,7 @@ spec:
           stdin: true
           tty: true
           command: ["sh", "-c", "/bin/bash"]
+          workingDir: /opt/gopath/src/github.com/hyperledger/fabric/peer
           envFrom:
             {{- if eq .Values.peer.databaseType "CouchDB" }}
             - secretRef:

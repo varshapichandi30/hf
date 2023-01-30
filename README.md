@@ -113,10 +113,26 @@ peer chaincode instantiate -o ord1-hlf-ord.orderers.svc.cluster.local:7050 -n sa
 peer chaincode query -C mychannel -n sacc -c '{"Args":["get","name"]}'
 
 peer chaincode invoke -o ord1-hlf-ord.orderers.svc.cluster.local:7050 --peerAddresses peer1-hlf-peer.peers.svc.cluster.local:7051 -C mychannel -n sacc -c '{"Args":["set","name","Brahma"]}'
+
+
+export ORDERER_CA=/var/hyperledger/tls/server/cert/key.pem
+export ORDERER_CONTAINER=ord1-hlf-ord.orderers.svc.cluster.local:7050
+
+peer lifecycle chaincode approveformyorg -o $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name sacc --version 1.0 --package-id $ID --sequence 1
+
+peer lifecycle chaincode commit -o  $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name sacc --version 1.0 --sequence 1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
+
+peer chaincode invoke -o  $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name sacc --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"function":"set","args":["name","Brahma"]}'
+
+
 ```
 
-***Remove Setup
+
+
+Remove Setup
+```
 NUM=1
+helm uninstall ca -n cas
 helm uninstall ord${NUM} -n orderers
 helm uninstall peer${NUM} -n peers
 helm uninstall cdb-peer${NUM} -n peers
