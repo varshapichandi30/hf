@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: CHAINCODE_ID
-              value: "marbles:2d798793d8683da47f22ce9f4ef288b094cc8dbdb337dc890a66173fb460dfc3" 
+              value: "marbles:6a395a425463ef6a7bf150a807adb85c5565d4ac6aee384cf378fdc54d0d65d2" 
             - name: CHAINCODE_ADDRESS
               value: "0.0.0.0:9999"
           ports:
