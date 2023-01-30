@@ -60,6 +60,7 @@ kubectl cp $CA_POD:/config ./build/crypto-config/ -n cas
 #Create peer secrets
 chmod 777 ./scripts/createPeerSecrets.sh
 ./scripts/createPeerSecrets.sh
+
 ```
 # Create Genesis and channel tx & secrets
 ```
@@ -94,7 +95,7 @@ kubectl logs -n peers $PEER_POD | grep 'Starting peer'
 ```
 helm install peer${NUM}-cli ./charts/hlf-peer-cli -n peers -f ./releases/helm_values/peer${NUM}-cli.yaml
 export CLI_POD=$(kubectl get pods --namespace peers -l "app=hlf-peer,release=peer1-cli" -o jsonpath="{.items[0].metadata.name}")
-kubectl exec -n peers --stdin --tty $CLI_POD  -- bin/bash
+kubectl exec -n peers --stdin --tty $CLI_POD  -- sh
 
 FABRIC_CFG_PATH=/etc/hyperledger/fabric/
 CORE_PEER_MSPCONFIGPATH=/var/hyperledger/admin_msp/
@@ -140,3 +141,33 @@ helm uninstall peer${NUM}-cli -n peers
 kubectl delete secrets --all -n orderers
 kubectl delete secrets --all -n peers
 ```
+
+In the fabcar folder :
+create fabcar folder
+create fabcar.go
+go mod init github.com/hyperledger/fabric-samples/chaincode/fabcar/go
+go mod vendor
+
+kubectl cp  /home/lohith/hf/fabcar/ peer1-cli-hlf-peer-6d7f56bc69-bj92h:/opt/gopath/src/github.com/hyperledger/fabric/peer/fabcar -n peers
+peer lifecycle chaincode package basic.tar.gz -p /opt/gopath/src/github.com/hyperledger/fabric/peer/fabcar --label basic_1.0
+peer lifecycle chaincode install basic.tar.gz
+peer lifecycle chaincode queryinstalled
+export ORDERER_CA=/var/hyperledger/tls/server/cert/key.pem
+export ORDERER_CONTAINER=ord1-hlf-ord.orderers.svc.cluster.local:7050
+export ID=basic_1.0:d14a94f52067abe5830fafecf4a9ac236fb5f7298ca1f5c4a86b9e44b9d1cc5e 
+peer lifecycle chaincode approveformyorg -o $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name basic --version 1.0 --package-id $ID --sequence 1
+peer lifecycle chaincode commit -o  $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name basic --version 1.0 --sequence 1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
+peer chaincode invoke -o  $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name basic --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"function":"InitLedger","args":[]}'
+peer chaincode query -C mychannel -n basic -c '{"Args":["QueryAllCars"]}'
+peer chaincode invoke -o  $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name basic --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"function":"CreateCar","args":["dddd","ffff","ggg","ttt","lll"]}'
+peer chaincode invoke -o  $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name basic --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"function":"QueryCar","args":["dddd"]}'
+
+External Chaincode :
+kubectl cp  /home/lohith/hf/chaincode1/ peer1-cli-hlf-peer-6d7f56bc69-6pdlm:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode1 -n peers
+peer lifecycle chaincode install chaincode1/chaincode.tgz
+peer lifecycle chaincode queryinstalled
+export ORDERER_CA=/var/hyperledger/tls/server/cert/key.pem
+export ORDERER_CONTAINER=ord1-hlf-ord.orderers.svc.cluster.local:7050
+export ID=marbles:2d798793d8683da47f22ce9f4ef288b094cc8dbdb337dc890a66173fb460dfc3
+peer lifecycle chaincode approveformyorg -o $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name marbles --version 1.0 --package-id $ID --sequence 1
+

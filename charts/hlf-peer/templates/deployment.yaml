@@ -24,6 +24,33 @@ spec:
         - name: {{ .Values.image.pullImageSecret }}
       {{- end }}
       volumes:
+        - name: builders-config   
+          configMap:  
+            name: builders-config 
+            items:    
+              - key: core.yaml    
+                path: core.yaml   
+        - name: external-builder-detect   
+          configMap:  
+            name: builders-config 
+            items:    
+              - key: detect   
+                path: detect  
+                mode: 0544    
+        - name: external-builder-release  
+          configMap:  
+            name: builders-config 
+            items:    
+              - key: release  
+                path: release 
+                mode: 0544
+        - name: external-builder-build    
+          configMap:  
+            name: builders-config 
+            items:    
+              - key: build    
+                path: build   
+                mode: 0544 
         - name: data
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
@@ -180,6 +207,18 @@ spec:
           volumeMounts:
             - mountPath: /var/hyperledger
               name: data
+            - mountPath: /etc/hyperledger/fabric/core.yaml  
+              name: builders-config 
+              subPath: core.yaml    
+            - mountPath: /builders/external/bin/detect  
+              name: external-builder-detect 
+              subPath: detect   
+            - mountPath: /builders/external/bin/build   
+              name: external-builder-build  
+              subPath: build    
+            - mountPath: /builders/external/bin/release 
+              name: external-builder-release    
+              subPath: release
             {{- if .Values.peer.docker.enabled }}
             - mountPath: /host/var/run/docker.sock
               name: dockersocket

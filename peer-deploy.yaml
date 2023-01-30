@@ -1,0 +1,31 @@
+#---------------- Chaincode Deployment ---------------------
+# CC_ID Package ID: marbles:2d798793d8683da47f22ce9f4ef288b094cc8dbdb337dc890a66173fb460dfc3
+apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: chaincode-marbles
+  namespace: peers
+  labels:
+    app: chaincode-marbles
+spec:
+  selector:
+    matchLabels:
+      app: chaincode-marbles
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: chaincode-marbles
+    spec:
+      containers:
+        - image: docker.io/varshapichandi30/chaincode1:1.0 #mention the image name
+          name: chaincode
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: CHAINCODE_ID
+              value: "marbles:2d798793d8683da47f22ce9f4ef288b094cc8dbdb337dc890a66173fb460dfc3" 
+            - name: CHAINCODE_ADDRESS
+              value: "0.0.0.0:9999"
+          ports:
+            - containerPort: 9999
