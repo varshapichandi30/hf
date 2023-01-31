@@ -19,12 +19,12 @@ spec:
         app: chaincode-marbles
     spec:
       containers:
-        - image: docker.io/varshapichandi30/chaincode1:1.0 #mention the image name
+        - image: docker.io/varshapichandi30/chaincode:1.0 #mention the image name
           name: chaincode
           imagePullPolicy: IfNotPresent
           env:
             - name: CHAINCODE_ID
-              value: "marbles:6a395a425463ef6a7bf150a807adb85c5565d4ac6aee384cf378fdc54d0d65d2" 
+              value: "marbles:1213c935da0ba631d0cc36e27d83b0685afc71297933a7101362cd6f92daf7d1" 
             - name: CHAINCODE_ADDRESS
               value: "0.0.0.0:9999"
           ports:

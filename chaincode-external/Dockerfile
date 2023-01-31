@@ -1,17 +1,18 @@
-# Copyright IBM Corp. All Rights Reserved.
-#
-# SPDX-License-Identifier: Apache-2.0
+FROM golang:1.14.6-alpine AS build
 
-ARG GO_VER=1.14.4
-ARG ALPINE_VER=3.12
+COPY ./ /go/src/github.com/marbles/chaincode-ex
+WORKDIR /go/src/github.com/marbles/chaincode-ex
 
-FROM golang:${GO_VER}-alpine${ALPINE_VER}
+# Build application
+RUN go build -o chaincode-ex -v .
 
-WORKDIR /go/src/github.com/hyperledger/fabric-samples/asset-transfer-basic/chaincode-external
-COPY . .
+# Production ready image
+# Pass the binary to the prod image
+FROM alpine:3.11 as prod
 
-RUN go get -d -v ./...
-RUN go install -v ./...
+COPY --from=build /go/src/github.com/marbles/chaincode-ex /app/chaincode-ex
 
-EXPOSE 9999
-CMD ["chaincode-external"]
+USER 1000
+
+WORKDIR /app
+CMD ./chaincode-ex
