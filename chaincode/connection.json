@@ -1,5 +1,5 @@
 {
-    "address": "chaincode-marbles.carrier-net.svc.cluster.local:9999",
+    "address": "chaincode.peers.svc.cluster.local:7051",
     "dial_timeout": "10s",
     "tls_required": false
 }

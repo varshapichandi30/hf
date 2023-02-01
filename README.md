@@ -60,7 +60,7 @@ kubectl cp $CA_POD:/config ./build/crypto-config/ -n cas
 #Create peer secrets
 chmod 777 ./scripts/createPeerSecrets.sh
 ./scripts/createPeerSecrets.sh
-kubectl cp peer1-cli-hlf-peer-6d7f56bc69-ghkhf:/etc/hyperledger/fabric/core.yaml /home/lohith/hf/ -n peers
+
 ```
 # Create Genesis and channel tx & secrets
 ```
@@ -107,13 +107,6 @@ peer channel create -o ord1-hlf-ord.orderers.svc.cluster.local:7050 -c mychannel
 peer channel fetch config mychannel.block -c mychannel -o ord1-hlf-ord.orderers.svc.cluster.local:7050 --tls --cafile /var/hyperledger/tls/server/cert/key.pem
 peer channel join -b mychannel.block
 
-# Deploy chaincode and test
-
-peer chaincode instantiate -o ord1-hlf-ord.orderers.svc.cluster.local:7050 -n sacc -v 1.0 -c '{"Args":["key1","value1"]}' -C mychannel
-
-peer chaincode query -C mychannel -n sacc -c '{"Args":["get","name"]}'
-
-peer chaincode invoke -o ord1-hlf-ord.orderers.svc.cluster.local:7050 --peerAddresses peer1-hlf-peer.peers.svc.cluster.local:7051 -C mychannel -n sacc -c '{"Args":["set","name","Brahma"]}'
 
 
 export ORDERER_CA=/var/hyperledger/tls/server/cert/key.pem
@@ -140,6 +133,8 @@ helm uninstall cdb-peer${NUM} -n peers
 helm uninstall peer${NUM}-cli -n peers
 kubectl delete secrets --all -n orderers
 kubectl delete secrets --all -n peers
+kubectl delete secrets --all -n cas
+kubectl delete ns peers orderers cas
 ```
 
 In the fabcar folder :
@@ -149,7 +144,7 @@ go mod init github.com/hyperledger/fabric-samples/chaincode/fabcar/go
 go mod vendor
 
 
-kubectl cp  /home/lohith/hf/chaincode/ peer1-cli-hlf-peer-6d7f56bc69-ghkhf:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode -n peers
+kubectl cp  /home/lohith/hf/fabcar peer1-cli-hlf-peer-6d7f56bc69-n772j:/opt/gopath/src/github.com/hyperledger/fabric/peer/fabcar -n peers
 peer lifecycle chaincode package basic.tar.gz -p /opt/gopath/src/github.com/hyperledger/fabric/peer/fabcar --label basic_1.0
 peer lifecycle chaincode install basic.tar.gz
 peer lifecycle chaincode queryinstalled
@@ -164,11 +159,15 @@ peer chaincode invoke -o  $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channe
 peer chaincode invoke -o  $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name basic --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"function":"QueryCar","args":["dddd"]}'
 
 External Chaincode :
-kubectl cp  /home/lohith/hf/chaincode-external peer1-cli-hlf-peer-6d7f56bc69-466sv:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode-external -n peers
-peer lifecycle chaincode install chaincode-external/chaincode-external.tgz
+kubectl cp  /home/lohith/hf/chaincode peer1-cli-hlf-peer-7f77c4968b-58mmj:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode -n peers
+peer lifecycle chaincode install chaincode/chaincode.tgz
 peer lifecycle chaincode queryinstalled
 export ORDERER_CA=/var/hyperledger/tls/server/cert/key.pem
 export ORDERER_CONTAINER=ord1-hlf-ord.orderers.svc.cluster.local:7050
-export ID=marbles:6a395a425463ef6a7bf150a807adb85c5565d4ac6aee384cf378fdc54d0d65d2
-peer lifecycle chaincode approveformyorg -o $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name marbles --version 1.0 --package-id $ID --sequence 1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
+export ID=marbles:1213c935da0ba631d0cc36e27d83b0685afc71297933a7101362cd6f92daf7d1
+peer lifecycle chaincode approveformyorg -o $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name marbles --version 1.0 --package-id $ID --sequence 3 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
+peer lifecycle chaincode commit -o  $ORDERER_CONTAINER --tls --cafile $ORDERER_CA --channelID mychannel --name marbles --version 1.0 --sequence 3 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
+peer chaincode invoke -o  $ORDERER_CONTAINER --tls true --cafile $ORDERER_CA -C mychannel -n marbles --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"Args":["initMarble","marble1","blue","35","tom"]}' --waitForEvent
+peer chaincode query -C mychannel -n marbles -c '{"Args":["readMarble","marble1"]}'
 
+kubectl cp peer1-cli-hlf-peer-6d7f56bc69-n772j:/etc/hyperledger/fabric/core.yaml /home/lohith/hf/core.yaml -n peers

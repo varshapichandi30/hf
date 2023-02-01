@@ -270,12 +270,12 @@ data:
                 # Note that it is applicable to all channels the peer has joined. The implication is that requiredPeerCount has to
                 # be smaller than the number of peers in a channel that has the lowest numbers of peers from the organization.
                 implicitCollectionDisseminationPolicy:
-                # requiredPeerCount defines the minimum number of eligible peers to which the peer must successfully
-                # disseminate private data for its own implicit collection during endorsement. Default value is 0.
-                requiredPeerCount: 0
-                # maxPeerCount defines the maximum number of eligible peers to which the peer will attempt to
-                # disseminate private data for its own implicit collection during endorsement. Default value is 1.
-                maxPeerCount: 1
+                  # requiredPeerCount defines the minimum number of eligible peers to which the peer must successfully
+                  # disseminate private data for its own implicit collection during endorsement. Default value is 0.
+                  requiredPeerCount: 0
+                  # maxPeerCount defines the maximum number of eligible peers to which the peer will attempt to
+                  # disseminate private data for its own implicit collection during endorsement. Default value is 1.
+                  maxPeerCount: 1
 
             # Gossip state transfer related configuration
             state:
@@ -328,7 +328,7 @@ data:
             # Set of root certificate authorities used to verify client certificates
             clientRootCAs:
                 files:
-                - tls/ca.crt
+                  - tls/ca.crt
             # Private key used for TLS when making client connections.  If
             # not set, peer.tls.key.file will be used instead
             clientKey:
@@ -395,21 +395,14 @@ data:
 
         # Delivery service related config
         deliveryclient:
-            # Enables this peer to disseminate blocks it pulled from the ordering service
-            # via gossip.
-            # Note that 'gossip.state.enabled' controls point to point block replication
-            # of blocks committed in the past.
-            blockGossipEnabled: true
             # It sets the total time the delivery service may spend in reconnection
-            # attempts until its retry logic gives up and returns an error,
-            # ignored if peer is a static leader
+            # attempts until its retry logic gives up and returns an error
             reconnectTotalTimeThreshold: 3600s
 
             # It sets the delivery service <-> ordering service node connection timeout
             connTimeout: 3s
 
-            # It sets the delivery service maximal delay between consecutive retries.
-            # Time between retries will have exponential backoff until hitting this threshold.
+            # It sets the delivery service maximal delay between consecutive retries
             reConnectBackoffThreshold: 3600s
 
             # A list of orderer endpoint addresses which should be overridden
@@ -465,19 +458,19 @@ data:
         #     library: /etc/hyperledger/fabric/plugin/escc.so
         handlers:
             authFilters:
-            -
+              -
                 name: DefaultAuth
-            -
+              -
                 name: ExpirationCheck    # This filter checks identity x509 certificate expiration
             decorators:
-            -
+              -
                 name: DefaultDecorator
             endorsers:
-            escc:
+              escc:
                 name: DefaultEndorsement
                 library:
             validators:
-            vscc:
+              vscc:
                 name: DefaultValidation
                 library:
 
@@ -517,13 +510,6 @@ data:
                 # deliverService limits concurrent event listeners registered to deliver service for blocks and transaction events.
                 deliverService: 2500
 
-        # Since all nodes should be consistent it is recommended to keep
-        # the default value of 100MB for MaxRecvMsgSize & MaxSendMsgSize
-        # Max message size in bytes GRPC server and client can receive
-        maxRecvMsgSize: 104857600
-        # Max message size in bytes GRPC server and client can send
-        maxSendMsgSize: 104857600
-
     ###############################################################################
     #
     #    VM section
@@ -535,7 +521,7 @@ data:
         # unix:///var/run/docker.sock
         # http://localhost:2375
         # https://localhost:2376
-        endpoint: unix:///var/run/docker.sock
+        # endpoint: unix:///var/run/docker.sock
 
         # settings for docker vms
         docker:
@@ -566,7 +552,7 @@ data:
             hostConfig:
                 NetworkMode: host
                 Dns:
-                # - 192.168.0.1
+                  # - 192.168.0.1
                 LogConfig:
                     Type: json-file
                     Config:
@@ -618,7 +604,7 @@ data:
         # List of directories to treat as external builders and launchers for
         # chaincode. The external builder detection processing will iterate over the
         # builders in the order specified below.
-        externalBuilders: 
+        externalBuilders:
             - path: /builders/external
               name: external-builder
             #   propagateEnvironment:
@@ -656,21 +642,22 @@ data:
         keepalive: 0
 
         # enabled system chaincodes
-        # To override this property via env variable use CORE_CHAINCODE_SYSTEM: {"xxx:": "enable"}
         system:
             _lifecycle: enable
             cscc: enable
             lscc: enable
             qscc: enable
+            escc: enable
+            vscc: enable
 
         # Logging section for the chaincode container
         logging:
-        # Default level for all loggers within the chaincode container
-        level:  info
-        # Override default level for the 'shim' logger
-        shim:   warning
-        # Format for the chaincode container logs
-        format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
+          # Default level for all loggers within the chaincode container
+          level:  info
+          # Override default level for the 'shim' logger
+          shim:   warning
+          # Format for the chaincode container logs
+          format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
 
     ###############################################################################
     #
@@ -680,9 +667,9 @@ data:
     ###############################################################################
     ledger:
 
-    blockchain:
+      blockchain:
 
-    state:
+      state:
         # stateDatabase - options are "goleveldb", "CouchDB"
         # goleveldb - default state database stored in goleveldb.
         # CouchDB - store state database in CouchDB
@@ -690,59 +677,59 @@ data:
         # Limit on the number of records to return per query
         totalQueryLimit: 100000
         couchDBConfig:
-        # It is recommended to run CouchDB on the same server as the peer, and
-        # not map the CouchDB container port to a server port in docker-compose.
-        # Otherwise proper security must be provided on the connection between
-        # CouchDB client (on the peer) and server.
-        couchDBAddress: 127.0.0.1:5984
-        # This username must have read and write authority on CouchDB
-        username:
-        # The password is recommended to pass as an environment variable
-        # during start up (eg CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD).
-        # If it is stored here, the file must be access control protected
-        # to prevent unintended users from discovering the password.
-        password:
-        # Number of retries for CouchDB errors
-        maxRetries: 3
-        # Number of retries for CouchDB errors during peer startup.
-        # The delay between retries doubles for each attempt.
-        # Default of 10 retries results in 11 attempts over 2 minutes.
-        maxRetriesOnStartup: 10
-        # CouchDB request timeout (unit: duration, e.g. 20s)
-        requestTimeout: 35s
-        # Limit on the number of records per each CouchDB query
-        # Note that chaincode queries are only bound by totalQueryLimit.
-        # Internally the chaincode may execute multiple CouchDB queries,
-        # each of size internalQueryLimit.
-        internalQueryLimit: 1000
-        # Limit on the number of records per CouchDB bulk update batch
-        maxBatchUpdateSize: 1000
-        # Warm indexes after every N blocks.
-        # This option warms any indexes that have been
-        # deployed to CouchDB after every N blocks.
-        # A value of 1 will warm indexes after every block commit,
-        # to ensure fast selector queries.
-        # Increasing the value may improve write efficiency of peer and CouchDB,
-        # but may degrade query response time.
-        warmIndexesAfterNBlocks: 1
-        # Create the _global_changes system database
-        # This is optional.  Creating the global changes database will require
-        # additional system resources to track changes and maintain the database
-        createGlobalChangesDB: false
-        # CacheSize denotes the maximum mega bytes (MB) to be allocated for the in-memory state
-        # cache. Note that CacheSize needs to be a multiple of 32 MB. If it is not a multiple
-        # of 32 MB, the peer would round the size to the next multiple of 32 MB.
-        # To disable the cache, 0 MB needs to be assigned to the cacheSize.
-        cacheSize: 64
+          # It is recommended to run CouchDB on the same server as the peer, and
+          # not map the CouchDB container port to a server port in docker-compose.
+          # Otherwise proper security must be provided on the connection between
+          # CouchDB client (on the peer) and server.
+          couchDBAddress: 127.0.0.1:5984
+          # This username must have read and write authority on CouchDB
+          username:
+          # The password is recommended to pass as an environment variable
+          # during start up (eg CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD).
+          # If it is stored here, the file must be access control protected
+          # to prevent unintended users from discovering the password.
+          password:
+          # Number of retries for CouchDB errors
+          maxRetries: 3
+          # Number of retries for CouchDB errors during peer startup.
+          # The delay between retries doubles for each attempt.
+          # Default of 10 retries results in 11 attempts over 2 minutes.
+          maxRetriesOnStartup: 10
+          # CouchDB request timeout (unit: duration, e.g. 20s)
+          requestTimeout: 35s
+          # Limit on the number of records per each CouchDB query
+          # Note that chaincode queries are only bound by totalQueryLimit.
+          # Internally the chaincode may execute multiple CouchDB queries,
+          # each of size internalQueryLimit.
+          internalQueryLimit: 1000
+          # Limit on the number of records per CouchDB bulk update batch
+          maxBatchUpdateSize: 1000
+          # Warm indexes after every N blocks.
+          # This option warms any indexes that have been
+          # deployed to CouchDB after every N blocks.
+          # A value of 1 will warm indexes after every block commit,
+          # to ensure fast selector queries.
+          # Increasing the value may improve write efficiency of peer and CouchDB,
+          # but may degrade query response time.
+          warmIndexesAfterNBlocks: 1
+          # Create the _global_changes system database
+          # This is optional.  Creating the global changes database will require
+          # additional system resources to track changes and maintain the database
+          createGlobalChangesDB: false
+          # CacheSize denotes the maximum mega bytes (MB) to be allocated for the in-memory state
+          # cache. Note that CacheSize needs to be a multiple of 32 MB. If it is not a multiple
+          # of 32 MB, the peer would round the size to the next multiple of 32 MB.
+          # To disable the cache, 0 MB needs to be assigned to the cacheSize.
+          cacheSize: 64
 
-    history:
+      history:
         # enableHistoryDatabase - options are true or false
         # Indicates if the history of key updates should be stored.
         # All history 'index' will be stored in goleveldb, regardless if using
         # CouchDB or alternate database for the state.
         enableHistoryDatabase: true
 
-    pvtdataStore:
+      pvtdataStore:
         # the maximum db batch size for converting
         # the ineligible missing data entries to eligible missing data entries
         collElgProcMaxDbBatchSize: 5000

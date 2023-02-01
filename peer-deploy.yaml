@@ -3,20 +3,20 @@
 apiVersion: apps/v1 # for versions before 1.8.0 use apps/v1beta1
 kind: Deployment
 metadata:
-  name: chaincode-marbles
+  name: chaincode
   namespace: peers
   labels:
-    app: chaincode-marbles
+    app: chaincode
 spec:
   selector:
     matchLabels:
-      app: chaincode-marbles
+      app: chaincode
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: chaincode-marbles
+        app: chaincode
     spec:
       containers:
         - image: docker.io/varshapichandi30/chaincode:1.0 #mention the image name
@@ -24,8 +24,8 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: CHAINCODE_ID
-              value: "marbles:1213c935da0ba631d0cc36e27d83b0685afc71297933a7101362cd6f92daf7d1" 
+              value: "marbles:0e32bb3d8967c238a1cd9008fdd97c50b937b255dea6684a46c4cbcd21fdfa8f" 
             - name: CHAINCODE_ADDRESS
-              value: "0.0.0.0:9999"
+              value: "0.0.0.0:7051"
           ports:
-            - containerPort: 9999
+            - containerPort: 7051
